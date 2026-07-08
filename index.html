@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>STU // LEVEL 30</title>
+  <style>
+    :root {
+      --page: #17171d;
+      --shell: #c7c3b8;
+      --shell-dark: #9a968c;
+      --shell-light: #ebe5d6;
+      --screen-frame: #34343d;
+      --screen: #9bbc0f;
+      --screen-2: #8bac0f;
+      --pixel-dark: #0f380f;
+      --pixel-mid: #306230;
+      --pixel-soft: rgba(15, 56, 15, .22);
+      --button: #8d1749;
+      --button-dark: #5b0d2f;
+      --blue: #232339;
+      --shadow: 0 18px 60px rgba(0,0,0,.42);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      min-height: 100dvh;
+      color: var(--pixel-dark);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(155,188,15,.16), transparent 25%),
+        radial-gradient(circle at 90% 30%, rgba(141,23,73,.18), transparent 30%),
+        linear-gradient(135deg, #101018, #242333 58%, #111118);
+      font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .28;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: radial-gradient(circle at center, black, transparent 74%);
+    }
+
+    button {
+      font: inherit;
+      border: 0;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    #confetti {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 450px;
+      min-height: 100dvh;
+      padding: 14px 12px 22px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .gameboy {
+      width: 100%;
+      background: linear-gradient(145deg, var(--shell-light), var(--shell) 62%, var(--shell-dark));
+      border-radius: 28px 28px 56px 28px;
+      box-shadow: var(--shadow), inset 0 2px 0 rgba(255,255,255,.65), inset 0 -5px 0 rgba(0,0,0,.12);
+      padding: 18px 14px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gameboy::after {
+      content: "";
+      position: absolute;
+      right: 18px;
+      bottom: 14px;
+      width: 74px;
+      height: 18px;
+      border-radius: 999px;
+      background: repeating-linear-gradient(90deg, rgba(0,0,0,.18) 0 5px, transparent 5px 10px);
+      transform: rotate(-17deg);
+      opacity: .55;
+    }
+
+    .top-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 8px 10px;
+      color: #44434b;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .top-label::before, .top-label::after {
+      content: "";
+      height: 3px;
+      flex: 1;
+      border-top: 2px solid rgba(95,83,126,.42);
+      border-bottom: 2px solid rgba(95,83,126,.42);
+    }
+
+    .screen-frame {
+      background: var(--screen-frame);
+      border-radius: 18px 18px 38px 18px;
+      padding: 18px 14px 26px;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.04), inset 0 -8px 0 rgba(0,0,0,.18);
+      position: relative;
+    }
+
+    .power {
+      position: absolute;
+      left: 12px;
+      top: 54px;
+      color: #d7d4c9;
+      font-size: 8px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transform: rotate(-90deg);
+      transform-origin: left top;
+    }
+
+    .power::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d14f4a;
+      box-shadow: 0 0 10px #d14f4a;
+      margin-right: 5px;
+      vertical-align: -1px;
+      animation: blink 1.8s steps(2, end) infinite;
+    }
+
+    @keyframes blink { 50% { opacity: .35; } }
+
+    .screen {
+      min-height: 470px;
+      background:
+        linear-gradient(rgba(15,56,15,.055) 50%, rgba(15,56,15,.12) 50%),
+        radial-gradient(circle at 22% 18%, rgba(255,255,255,.18), transparent 28%),
+        linear-gradient(150deg, var(--screen), var(--screen-2));
+      background-size: 100% 4px, auto, auto;
+      border-radius: 9px;
+      border: 4px solid #1f1f25;
+      box-shadow: inset 0 0 34px rgba(15,56,15,.35), inset 0 0 0 2px rgba(255,255,255,.12);
+      overflow: hidden;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, transparent 42%, rgba(15,56,15,.18));
+      z-index: 10;
+      mix-blend-mode: multiply;
+    }
+
+    .view {
+      min-height: 470px;
+      padding: 17px 14px 13px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      animation: screenIn .28s steps(4, end) both;
+      position: relative;
+      z-index: 2;
+    }
+
+    .view.active { display: flex; }
+
+    @keyframes screenIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .battery {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .battery span {
+      display: inline-block;
+      width: 22px;
+      height: 9px;
+      border: 2px solid var(--pixel-dark);
+      position: relative;
+    }
+
+    .battery span::before {
+      content: "";
+      position: absolute;
+      right: -5px;
+      top: 2px;
+      width: 3px;
+      height: 3px;
+      background: var(--pixel-dark);
+    }
+
+    .battery span::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      width: 14px;
+      background: var(--pixel-dark);
+      animation: battery 2.2s steps(3, end) infinite;
+    }
+
+    @keyframes battery { 50% { width: 7px; } }
+
+    .battery.low span::after {
+      width: 4px;
+      animation: lowBatteryDrain .9s steps(2, end) infinite;
+    }
+
+    .battery.low {
+      animation: lowBatteryFlash 1.1s steps(2, end) infinite;
+    }
+
+    @keyframes lowBatteryDrain {
+      50% { width: 1px; }
+    }
+
+    @keyframes lowBatteryFlash {
+      50% { opacity: .48; }
+    }
+
+    .low-warning {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      border: 3px solid var(--pixel-dark);
+      padding: 5px 7px;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: rgba(15,56,15,.12);
+      animation: warningBlink 1.15s steps(2,end) infinite;
+    }
+
+    .low-warning::before {
+      content: "";
+      width: 18px;
+      height: 9px;
+      border: 2px solid var(--pixel-dark);
+      box-shadow: inset 4px 0 0 var(--pixel-dark);
+    }
+
+    @keyframes warningBlink {
+      50% { transform: translateX(2px); }
+    }
+
+    .pixel-card {
+      border: 3px solid var(--pixel-dark);
+      box-shadow: 4px 4px 0 var(--pixel-dark);
+      background: rgba(155,188,15,.46);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: clamp(31px, 10vw, 44px);
+      line-height: .93;
+      margin: 8px 0 8px;
+      letter-spacing: -0.09em;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0 rgba(15,56,15,.18);
+    }
+
+    .title small {
+      display: block;
+      font-size: .36em;
+      letter-spacing: .12em;
+      margin-bottom: 4px;
+      opacity: .9;
+    }
+
+    .subtitle, p {
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 0 0 10px;
+      font-weight: 700;
+    }
+
+    .tiny {
+      font-size: 10px;
+      line-height: 1.35;
+      opacity: .9;
+      margin: 0;
+    }
+
+    .sprite-zone {
+      min-height: 145px;
+      display: grid;
+      place-items: center;
+      margin: 4px 0 8px;
+      position: relative;
+    }
+
+    .stu-sprite {
+      width: 112px;
+      height: 112px;
+      position: relative;
+      image-rendering: pixelated;
+      animation: idle 1s steps(2, end) infinite;
+      filter: drop-shadow(6px 8px 0 rgba(15,56,15,.22));
+    }
+
+    .stu-sprite::before {
+      content: "";
+      position: absolute;
+      left: 36px;
+      top: 10px;
+      width: 40px;
+      height: 40px;
+      background: var(--pixel-dark);
+      box-shadow:
+        -14px 14px 0 var(--pixel-dark),
+        14px 14px 0 var(--pixel-dark),
+        -28px 42px 0 var(--pixel-dark),
+        -14px 42px 0 var(--pixel-dark),
+        0 42px 0 var(--pixel-dark),
+        14px 42px 0 var(--pixel-dark),
+        28px 42px 0 var(--pixel-dark),
+        -28px 56px 0 var(--pixel-dark),
+        -14px 56px 0 transparent,
+        0 56px 0 var(--pixel-dark),
+        14px 56px 0 transparent,
+        28px 56px 0 var(--pixel-dark),
+        -14px 70px 0 var(--pixel-dark),
+        14px 70px 0 var(--pixel-dark),
+        -14px 84px 0 var(--pixel-dark),
+        14px 84px 0 var(--pixel-dark);
+    }
+
+    .stu-sprite::after {
+      content: "STU";
+      position: absolute;
+      left: 36px;
+      top: 55px;
+      width: 42px;
+      color: var(--screen);
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: -.08em;
+    }
+
+    @keyframes idle {
+      50% { transform: translateY(-5px); }
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      animation: orbit 7s linear infinite;
+    }
+
+    .orbit .px {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      opacity: .82;
+      image-rendering: pixelated;
+    }
+
+    .orbit .px:nth-child(1) { left: 8%; top: 16%; }
+    .orbit .px:nth-child(2) { right: 7%; top: 22%; }
+    .orbit .px:nth-child(3) { left: 12%; bottom: 10%; }
+    .orbit .px:nth-child(4) { right: 12%; bottom: 7%; }
+    .orbit .px:nth-child(5) { left: 43%; top: 0; }
+    .orbit .px:nth-child(6) { left: 0; top: 48%; }
+    .orbit .px:nth-child(7) { right: 0; top: 50%; }
+
+    @keyframes orbit { to { transform: rotate(360deg); } }
+
+    .px-star {
+      background: var(--pixel-dark);
+      clip-path: polygon(50% 0, 61% 34%, 98% 35%, 68% 56%, 79% 91%, 50% 70%, 21% 91%, 32% 56%, 2% 35%, 39% 34%);
+    }
+
+    .px-sword::before {
+      content: "";
+      position: absolute;
+      left: 11px;
+      top: 1px;
+      width: 4px;
+      height: 18px;
+      background: var(--pixel-dark);
+      box-shadow: -4px 15px 0 var(--pixel-dark), 4px 15px 0 var(--pixel-dark), 0 20px 0 var(--pixel-dark);
+      transform: rotate(38deg);
+    }
+
+    .px-ball {
+      border: 3px solid var(--pixel-dark);
+      border-radius: 50%;
+      background: linear-gradient(var(--pixel-dark) 0 46%, transparent 46% 54%, var(--pixel-dark) 54% 100%);
+    }
+
+    .px-ring {
+      border: 5px solid var(--pixel-dark);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 3px rgba(15,56,15,.22);
+    }
+
+    .px-dragon::before {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 6px;
+      width: 18px;
+      height: 12px;
+      background: var(--pixel-dark);
+      box-shadow: 12px -5px 0 -3px var(--pixel-dark), 15px 1px 0 -4px var(--pixel-dark), -2px 10px 0 -3px var(--pixel-dark);
+      clip-path: polygon(0 30%, 55% 0, 100% 35%, 70% 40%, 100% 70%, 40% 62%, 0 100%);
+    }
+
+    .px-crash::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 5px;
+      width: 17px;
+      height: 17px;
+      background: var(--pixel-dark);
+      clip-path: polygon(50% 0, 65% 28%, 100% 20%, 76% 52%, 96% 86%, 55% 68%, 20% 100%, 26% 58%, 0 38%, 36% 32%);
+    }
+
+    .px-dumbbell::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 10px;
+      width: 16px;
+      height: 4px;
+      background: var(--pixel-dark);
+      box-shadow: -3px -4px 0 1px var(--pixel-dark), -3px 4px 0 1px var(--pixel-dark), 15px -4px 0 1px var(--pixel-dark), 15px 4px 0 1px var(--pixel-dark);
+    }
+
+    .loading {
+      height: 13px;
+      border: 3px solid var(--pixel-dark);
+      background: transparent;
+      margin: 12px 0;
+      padding: 2px;
+    }
+
+    .loading span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--pixel-dark);
+      animation: load 2.7s steps(9, end) forwards;
+    }
+
+    @keyframes load { to { width: 100%; } }
+
+    .log {
+      padding: 0;
+      margin: 8px 0 0;
+      list-style: none;
+      font-size: 11px;
+      line-height: 1.55;
+      font-weight: 900;
+    }
+
+    .log li {
+      opacity: 0;
+      transform: translateX(-8px);
+      animation: line .25s steps(2, end) forwards;
+    }
+
+    .log li:nth-child(2) { animation-delay: .45s; }
+    .log li:nth-child(3) { animation-delay: .9s; }
+    .log li:nth-child(4) { animation-delay: 1.35s; }
+    .log li:nth-child(5) { animation-delay: 1.8s; }
+
+    @keyframes line { to { opacity: 1; transform: translateX(0); } }
+
+    .map {
+      height: 160px;
+      border: 3px solid var(--pixel-dark);
+      box-shadow: 4px 4px 0 var(--pixel-dark);
+      margin: 10px 0 12px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, transparent 49%, var(--pixel-soft) 49% 51%, transparent 51%),
+        linear-gradient(transparent 49%, var(--pixel-soft) 49% 51%, transparent 51%);
+      background-size: 28px 28px;
+    }
+
+    .map .place {
+      position: absolute;
+      border: 3px solid var(--pixel-dark);
+      background: rgba(155,188,15,.8);
+      padding: 6px 7px;
+      font-size: 10px;
+      font-weight: 900;
+      box-shadow: 3px 3px 0 var(--pixel-dark);
+    }
+
+    .mallorca { left: 11px; bottom: 19px; }
+    .barcelona { right: 11px; top: 18px; }
+
+    .route {
+      position: absolute;
+      left: 73px;
+      top: 78px;
+      width: 145px;
+      border-top: 3px dashed var(--pixel-dark);
+      transform: rotate(-25deg);
+      transform-origin: left center;
+    }
+
+    .plane {
+      position: absolute;
+      left: 56px;
+      top: 80px;
+      width: 26px;
+      height: 18px;
+      animation: fly 3.2s steps(8, end) infinite;
+    }
+
+    .plane::before {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 8px;
+      width: 20px;
+      height: 4px;
+      background: var(--pixel-dark);
+      box-shadow: 7px -5px 0 -1px var(--pixel-dark), 7px 5px 0 -1px var(--pixel-dark), 17px 0 0 -1px var(--pixel-dark);
+      clip-path: polygon(0 0, 78% 0, 100% 50%, 78% 100%, 0 100%, 14% 50%);
+    }
+
+    @keyframes fly {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(148px, -68px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    .inventory {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin: 8px 0 0;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 8px;
+      align-items: start;
+      border: 3px solid var(--pixel-dark);
+      background: rgba(155,188,15,.42);
+      box-shadow: 3px 3px 0 var(--pixel-dark);
+      padding: 8px;
+      animation: itemIn .25s steps(2,end) both;
+    }
+
+    .item:nth-child(2) { animation-delay: .08s; }
+    .item:nth-child(3) { animation-delay: .16s; }
+    .item:nth-child(4) { animation-delay: .24s; }
+    .item:nth-child(5) { animation-delay: .32s; }
+
+    @keyframes itemIn { from { opacity: 0; transform: translateX(-8px); } }
+
+    .item .ico {
+      width: 31px;
+      height: 31px;
+      display: block;
+      border: 2px solid var(--pixel-dark);
+      background: rgba(15,56,15,.1);
+      position: relative;
+      image-rendering: pixelated;
+    }
+
+    .ico-gi::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 5px;
+      width: 15px;
+      height: 18px;
+      border: 4px solid var(--pixel-dark);
+      border-top: 0;
+      box-shadow: -6px 2px 0 -2px var(--pixel-dark), 6px 2px 0 -2px var(--pixel-dark), 0 12px 0 -3px var(--pixel-dark);
+    }
+
+    .ico-dragon::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 7px;
+      width: 20px;
+      height: 14px;
+      background: var(--pixel-dark);
+      clip-path: polygon(0 35%, 50% 0, 100% 30%, 78% 45%, 100% 70%, 52% 62%, 0 100%);
+    }
+
+    .ico-digi::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      width: 14px;
+      height: 17px;
+      background: var(--pixel-dark);
+      box-shadow: -4px 5px 0 -2px var(--pixel-dark), 4px 5px 0 -2px var(--pixel-dark), 0 -4px 0 -2px var(--pixel-dark);
+      clip-path: polygon(50% 0, 85% 22%, 100% 70%, 50% 100%, 0 70%, 15% 22%);
+    }
+
+    .ico-kebab::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 12px;
+      width: 20px;
+      height: 11px;
+      background: var(--pixel-dark);
+      clip-path: polygon(0 0, 100% 0, 82% 100%, 18% 100%);
+    }
+
+    .ico-kebab::after {
+      content: "";
+      position: absolute;
+      left: 9px;
+      top: 6px;
+      width: 12px;
+      height: 8px;
+      background: var(--pixel-dark);
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+
+    .ico-wumpa::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 6px;
+      width: 17px;
+      height: 18px;
+      background: var(--pixel-dark);
+      clip-path: polygon(50% 0, 68% 26%, 100% 20%, 78% 54%, 92% 100%, 50% 75%, 8% 100%, 22% 54%, 0 20%, 32% 26%);
+    }
+
+    .item h3 {
+      margin: 0 0 3px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: -.03em;
+    }
+
+    .item p { font-size: 10.5px; margin: 0; line-height: 1.32; }
+
+    .stats {
+      display: grid;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .stat strong {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .bar {
+      height: 12px;
+      border: 3px solid var(--pixel-dark);
+      padding: 1px;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: var(--w);
+      background: var(--pixel-dark);
+      animation: stat 1s steps(6, end) both;
+      transition: width .35s steps(4,end);
+    }
+
+    @keyframes stat { from { width: 0; } }
+
+    .ring {
+      width: 94px;
+      height: 94px;
+      margin: 5px auto 0;
+      border: 8px solid var(--pixel-dark);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: inset 0 0 0 6px rgba(15,56,15,.22);
+      animation: ring 4s steps(12,end) infinite;
+    }
+
+    .ring::after {
+      content: "30";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    @keyframes ring { to { transform: rotate(360deg); } }
+
+    .dialogue {
+      border: 3px solid var(--pixel-dark);
+      box-shadow: 4px 4px 0 var(--pixel-dark);
+      padding: 10px;
+      background: rgba(155,188,15,.74);
+      min-height: 92px;
+    }
+
+    .dialogue p { margin-bottom: 0; }
+
+    .cursor::after {
+      content: "▾";
+      display: inline-block;
+      margin-left: 4px;
+      animation: cursor .8s steps(2, end) infinite;
+    }
+
+    @keyframes cursor { 50% { opacity: 0; } }
+
+
+
+    .battle-scene {
+      position: relative;
+      min-height: 132px;
+      display: grid;
+      place-items: center;
+      margin: 4px 0 8px;
+      overflow: hidden;
+    }
+
+    .boss-ring {
+      width: 100px;
+      height: 100px;
+      border: 8px solid var(--pixel-dark);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: inset 0 0 0 6px rgba(15,56,15,.22), 5px 5px 0 rgba(15,56,15,.2);
+      animation: ring 4s steps(12,end) infinite;
+    }
+
+    .boss-ring::before {
+      content: "30";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .boss-ring::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 14px;
+      height: 14px;
+      background: var(--pixel-dark);
+      box-shadow: 32px 0 0 var(--pixel-dark), 16px 30px 0 var(--pixel-dark);
+    }
+
+    .boss-ring.hit {
+      animation: bossHit .36s steps(3,end), ring 4s steps(12,end) infinite;
+    }
+
+    @keyframes bossHit {
+      20% { transform: translateX(-9px) rotate(-8deg); }
+      55% { transform: translateX(9px) rotate(8deg); opacity: .55; }
+      100% { transform: translateX(0); }
+    }
+
+    .attack-effect {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .attack-effect span {
+      position: absolute;
+      display: block;
+      opacity: 0;
+      image-rendering: pixelated;
+    }
+
+    .energy-beam {
+      left: 12px;
+      top: 64px;
+      width: 0;
+      height: 10px;
+      background: var(--pixel-dark);
+      box-shadow: 0 -10px 0 -3px var(--pixel-dark), 0 10px 0 -3px var(--pixel-dark);
+    }
+
+    .energy-beam::before {
+      content: "";
+      position: absolute;
+      right: -14px;
+      top: -7px;
+      width: 22px;
+      height: 22px;
+      background: var(--pixel-dark);
+      clip-path: polygon(50% 0, 61% 34%, 98% 35%, 68% 56%, 79% 91%, 50% 70%, 21% 91%, 32% 56%, 2% 35%, 39% 34%);
+    }
+
+    .spin-crash {
+      left: 30px;
+      top: 43px;
+      width: 48px;
+      height: 48px;
+      border: 7px dashed var(--pixel-dark);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 5px rgba(15,56,15,.18);
+    }
+
+    .spin-crash::before {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 13px;
+      width: 16px;
+      height: 16px;
+      background: var(--pixel-dark);
+      clip-path: polygon(50% 0, 66% 30%, 100% 22%, 76% 52%, 94% 90%, 53% 70%, 16% 100%, 24% 58%, 0 36%, 36% 32%);
+    }
+
+    .thunder-bolt {
+      left: 50%;
+      top: -16px;
+      width: 34px;
+      height: 86px;
+      background: var(--pixel-dark);
+      clip-path: polygon(50% 0, 100% 0, 64% 38%, 98% 38%, 28% 100%, 44% 54%, 10% 54%);
+    }
+
+    .battle-scene.attack-1 .energy-beam {
+      animation: ondaVital .72s steps(6,end);
+    }
+
+    .battle-scene.attack-2 .spin-crash {
+      animation: spinAttack .72s steps(8,end);
+    }
+
+    .battle-scene.attack-3 .thunder-bolt {
+      animation: impactrueno .82s steps(6,end);
+    }
+
+    .screen.shock, .battle-scene.shock {
+      animation: screenShake .26s steps(4,end);
+    }
+
+    @keyframes ondaVital {
+      0% { opacity: 1; width: 0; transform: translateX(-18px); }
+      45% { opacity: 1; width: 142px; transform: translateX(18px); }
+      80% { opacity: 1; width: 170px; transform: translateX(24px); }
+      100% { opacity: 0; width: 170px; transform: translateX(38px); }
+    }
+
+    @keyframes spinAttack {
+      0% { opacity: 1; transform: translateX(-30px) rotate(0deg) scale(.7); }
+      60% { opacity: 1; transform: translateX(126px) rotate(720deg) scale(1.15); }
+      100% { opacity: 0; transform: translateX(158px) rotate(900deg) scale(.75); }
+    }
+
+    @keyframes impactrueno {
+      0% { opacity: 0; transform: translate(-50%, -38px) scaleY(.4); }
+      25% { opacity: 1; transform: translate(-50%, 10px) scaleY(1.08); }
+      60% { opacity: 1; transform: translate(-50%, 58px) scaleY(1.15); }
+      100% { opacity: 0; transform: translate(-50%, 76px) scaleY(.8); }
+    }
+
+    @keyframes screenShake {
+      20% { transform: translate(-5px, 2px); }
+      40% { transform: translate(5px, -2px); }
+      60% { transform: translate(-3px, -1px); }
+      80% { transform: translate(3px, 1px); }
+    }
+
+    .hp-box {
+      margin: 4px 0 8px;
+    }
+
+    .hp-box strong {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .hp-bar {
+      height: 15px;
+      border: 3px solid var(--pixel-dark);
+      padding: 2px;
+      background: rgba(15,56,15,.08);
+    }
+
+    .hp-bar span {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: var(--pixel-dark);
+      transition: width .35s steps(3,end);
+    }
+
+
+    .sound-toggle {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      z-index: 6;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 27px;
+      padding: 4px 8px;
+      border: 3px solid #44434b;
+      background: #d9d3c4;
+      color: #34343d;
+      box-shadow: 3px 3px 0 rgba(0,0,0,.22);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .sound-toggle:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 rgba(0,0,0,.22);
+    }
+
+    .sound-toggle.off {
+      opacity: .72;
+    }
+
+    .speaker-px {
+      width: 16px;
+      height: 14px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .speaker-px::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 5px;
+      height: 6px;
+      background: #34343d;
+      box-shadow: 5px -3px 0 0 #34343d, 5px 3px 0 0 #34343d;
+    }
+
+    .speaker-px::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 1px;
+      width: 6px;
+      height: 12px;
+      border-right: 3px solid #34343d;
+      border-radius: 50%;
+    }
+
+    .sound-toggle.off .speaker-px::after {
+      width: 12px;
+      height: 3px;
+      top: 5px;
+      right: 0;
+      border: 0;
+      background: #34343d;
+      transform: rotate(-38deg);
+    }
+
+    .konami-toast {
+      display: none;
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      border: 4px solid var(--pixel-dark);
+      box-shadow: 6px 6px 0 var(--pixel-dark);
+      background: rgba(155,188,15,.96);
+      color: var(--pixel-dark);
+      padding: 17px 12px;
+      text-align: center;
+      font-size: 18px;
+      line-height: 1.1;
+      font-weight: 900;
+      letter-spacing: -.05em;
+      text-transform: uppercase;
+    }
+
+    .konami-toast.show {
+      display: block;
+      animation: konamiPop 2.1s steps(5,end) both;
+    }
+
+    @keyframes konamiPop {
+      0% { opacity: 0; transform: translateY(-50%) scale(.82); }
+      12% { opacity: 1; transform: translateY(-50%) scale(1.05); }
+      22% { transform: translateY(-50%) scale(1); }
+      78% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-50%) scale(1); }
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 110px 1fr 116px;
+      gap: 10px;
+      align-items: center;
+      margin-top: 18px;
+      color: #2a2930;
+    }
+
+    .dpad {
+      width: 92px;
+      height: 92px;
+      position: relative;
+      margin-left: 5px;
+    }
+
+    .dpad::before, .dpad::after {
+      content: "";
+      position: absolute;
+      background: #262631;
+      border-radius: 7px;
+      box-shadow: inset 0 -4px 0 rgba(0,0,0,.34), 0 4px 0 rgba(255,255,255,.28);
+    }
+
+    .dpad::before { left: 31px; top: 0; width: 30px; height: 92px; }
+    .dpad::after { left: 0; top: 31px; width: 92px; height: 30px; }
+
+    .brand {
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: -.08em;
+      font-size: 17px;
+      align-self: start;
+      padding-top: 11px;
+    }
+
+    .brand small {
+      display: block;
+      font-size: 8px;
+      letter-spacing: .14em;
+      margin-top: 3px;
+      opacity: .74;
+    }
+
+    .ab {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      transform: rotate(-18deg);
+      margin-right: 4px;
+    }
+
+    .round {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #b73470, var(--button) 60%, var(--button-dark));
+      box-shadow: inset 0 -5px 0 rgba(0,0,0,.28), 0 5px 0 rgba(255,255,255,.26);
+      color: #2a1420;
+      font-size: 11px;
+      font-weight: 900;
+      padding-top: 27px;
+    }
+
+    .menu-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      width: 58px;
+      height: 17px;
+      border-radius: 999px;
+      background: #68636b;
+      box-shadow: inset 0 -3px 0 rgba(0,0,0,.28), 0 3px 0 rgba(255,255,255,.24);
+      transform: rotate(-18deg);
+      color: #292830;
+      font-size: 7px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      line-height: 17px;
+      padding: 0;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .pill:active {
+      transform: rotate(-18deg) translate(2px, 2px);
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,.24), 0 1px 0 rgba(255,255,255,.24);
+    }
+
+    .action-row {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .main-btn, .alt-btn {
+      width: 100%;
+      min-height: 42px;
+      border: 3px solid var(--pixel-dark);
+      box-shadow: 4px 4px 0 var(--pixel-dark);
+      background: var(--pixel-dark);
+      color: var(--screen);
+      text-transform: uppercase;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .04em;
+    }
+
+    .alt-btn {
+      background: transparent;
+      color: var(--pixel-dark);
+    }
+
+    .main-btn:active, .alt-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 var(--pixel-dark);
+    }
+
+    .shake { animation: shake .35s steps(4, end); }
+    @keyframes shake {
+      25% { transform: translateX(-6px); }
+      50% { transform: translateX(6px); }
+      75% { transform: translateX(-3px); }
+    }
+
+    .secret {
+      display: none;
+      margin-top: 8px;
+      border: 3px solid var(--pixel-dark);
+      box-shadow: 4px 4px 0 var(--pixel-dark);
+      padding: 9px;
+      background: rgba(15,56,15,.12);
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .secret.show { display: block; animation: screenIn .2s steps(2,end) both; }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 9px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(30,30,36,.68);
+      font-weight: 900;
+    }
+
+    @media (min-width: 620px) {
+      .wrap { max-width: 510px; padding: 28px 16px; }
+      .gameboy { padding: 24px 20px 28px; }
+      .screen { min-height: 520px; }
+      .view { min-height: 520px; padding: 22px 18px 16px; }
+      .subtitle, p { font-size: 14px; }
+      .item p { font-size: 11.5px; }
+      .inventory { grid-template-columns: 1fr 1fr; }
+      .item:last-child { grid-column: 1 / -1; }
+      .route { width: 190px; }
+      @keyframes fly {
+        0% { transform: translate(0, 0); }
+        50% { transform: translate(190px, -72px); }
+        100% { transform: translate(0, 0); }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <main class="wrap">
+    <div class="gameboy" id="device">
+      <button class="sound-toggle" id="soundBtn" onclick="toggleSound()" aria-label="Activar o desactivar sonido"><span class="speaker-px" aria-hidden="true"></span><span>SOUND: ON</span></button>
+      <div class="top-label">DOT MATRIX WITH STEREO SOUND</div>
+      <div class="screen-frame">
+        <div class="power">power</div>
+        <div class="screen" id="screen" role="application" aria-label="Felicitación interactiva para STU">
+          <section class="view active" data-view="0">
+            <div>
+              <div class="hud"><span>STU-30</span><span class="battery low">BAT LOW <span></span></span></div>
+              <div class="pixel-card">
+                <h1 class="title"><small>birthday cartridge</small>STU<br>LEVEL 30</h1>
+                <p class="subtitle">La pila interna se ha agotado. Pero se puede jugar. Sin embargo, no se producirá ningún evento temporal.</p>
+                <div class="low-warning">Internal battery dry</div>
+              </div>
+              <div class="sprite-zone" aria-hidden="true">
+                <div class="orbit"><span class="px px-dragon"></span><span class="px px-ring"></span><span class="px px-crash"></span><span class="px px-dumbbell"></span><span class="px px-star"></span><span class="px px-sword"></span><span class="px px-ball"></span></div>
+                <div class="stu-sprite"></div>
+              </div>
+              <div class="dialogue"><p class="cursor">Pulsa START para cargar la actualización 3.0.</p></div>
+            </div>
+            <div class="action-row">
+              <button class="main-btn" onclick="startGame()">START</button>
+              <button class="alt-btn" onclick="dangerButton()">Botón que STU no debería pulsar</button>
+              <p class="tiny" id="dangerText">Estado: estable. Chuck Norris todavía no ha intervenido.</p>
+            </div>
+          </section>
+
+          <section class="view" data-view="1">
+            <div>
+              <div class="hud"><span>BOOTING...</span><span>LV 30</span></div>
+              <div class="pixel-card">
+                <h2 class="title"><small>system update</small>STU 3.0</h2>
+                <p>Instalando nueva década. Puede incluir más fuerza, resacas infinitas, 0 descuentos jóvenes y dolores en sitios que no sabías que podías tener.</p>
+              </div>
+              <div class="loading"><span></span></div>
+              <ul class="log">
+                <li>&gt; Sincronizando Mallorca ↔ Barcelona... OK</li>
+                <li>&gt; Activando modo torneo del poder... OK</li>
+                <li>&gt; Comprobando digievolución... OK</li>
+                <li>&gt; Guardando partida en Tierra Media PS3... OK</li>
+                <li>&gt; Chuck Norris ha mirado la pantalla. Suficiente.</li>
+              </ul>
+            </div>
+            <div class="action-row"><button class="main-btn" onclick="nextView()">CONTINUAR</button></div>
+          </section>
+
+          <section class="view" data-view="2">
+            <div>
+              <div class="hud"><span>MAPA</span><span>CONEXIÓN OK</span></div>
+              <h2 class="title"><small>fast travel</small>Mallorca<br>Barcelona</h2>
+              <p>Aunque nos veamos menos de lo que tocaría, hay amistades que siguen guardadas en favoritos aunque cambie el mapa.</p>
+              <div class="map" aria-hidden="true">
+                <div class="place mallorca">Mallorca HQ</div>
+                <div class="place barcelona">BCN Base</div>
+                <div class="route"></div>
+                <div class="plane"></div>
+              </div>
+              <div class="dialogue"><p class="cursor">Distancia detectada. Vuelo programado. Birras, pendiente...</p></div>
+            </div>
+            <div class="action-row"><button class="main-btn" onclick="nextView()">ABRIR INVENTARIO</button></div>
+          </section>
+
+          <section class="view" data-view="3">
+            <div>
+              <div class="hud"><span>INVENTARIO</span><span>5/5</span></div>
+              <h2 class="title"><small>items equipped</small>Kit de STU</h2>
+              <div class="inventory">
+                <article class="item"><div class="ico ico-gi"></div><div><h3>KARATEGUI DE CHUCK</h3><p>Los 30 no llegan. Piden entrada educadamente.</p></div></article>
+                <article class="item"><div class="ico ico-dragon"></div><div><h3>FUROR DEL DRAGÓN</h3><p>Para cuando toca otra serie aunque el cuerpo diga “mañana”.</p></div></article>
+                <article class="item"><div class="ico ico-digi"></div><div><h3>Digievolución</h3><p>STUmon evoluciona: más criterio, mismo caos.</p></div></article>
+                <article class="item"><div class="ico ico-kebab"></div><div><h3>MANJAR DE LOS DIOSES</h3><p>Dicen que está más rico que un kilo de vrg.</p></div></article>
+                <article class="item"><div class="ico ico-wumpa"></div><div><h3>Caja Wumpa</h3><p>Romper obstáculos con voltereta innecesaria sigue siendo válido.</p></div></article>
+              </div>
+            </div>
+            <div class="action-row"><button class="main-btn" onclick="nextView()">BOSS FINAL</button></div>
+          </section>
+
+          <section class="view" data-view="4">
+            <div>
+              <div class="hud"><span>BOSS FIGHT</span><span id="bossHpText">HP 90/90</span></div>
+              <h2 class="title"><small>wild encounter</small>La<br>Treintena</h2>
+              <div class="battle-scene" id="battleScene" aria-hidden="true">
+                <div class="boss-ring" id="bossSprite"></div>
+                <div class="attack-effect"><span class="energy-beam"></span><span class="spin-crash"></span><span class="thunder-bolt"></span></div>
+              </div>
+              <div class="hp-box"><strong><span>Vida del boss</span><span id="bossHpLabel">90%</span></strong><div class="hp-bar"><span id="bossHpBar"></span></div></div>
+              <div class="stats">
+                <div class="stat"><strong><span>Crossfit</span><span id="statCrossfitText">0%</span></strong><div class="bar"><span id="statCrossfit" style="--w:0%"></span></div></div>
+                <div class="stat"><strong><span>Excusas para viajar</span><span id="statTravelText">0%</span></strong><div class="bar"><span id="statTravel" style="--w:0%"></span></div></div>
+                <div class="stat"><strong><span>Humor absurdo</span><span id="statHumorText">0%</span></strong><div class="bar"><span id="statHumor" style="--w:0%"></span></div></div>
+                <div class="stat"><strong><span>Rodillas recuperadas</span><span id="statKneesText">0%</span></strong><div class="bar"><span id="statKnees" style="--w:0%"></span></div></div>
+              </div>
+              <div class="dialogue"><p class="cursor" id="battleText">La Treintena apareció. Necesitas 3 ataques para continuar.</p></div>
+            </div>
+            <div class="action-row"><button class="main-btn" id="attackBtn" onclick="attackBoss()">A: ONDA VITAL</button></div>
+          </section>
+
+          <section class="view" data-view="5">
+            <div>
+              <div class="hud"><span>VICTORY</span><span>SAVE OK</span></div>
+              <h2 class="title"><small>quest cleared</small>Feliz 30,<br>STU</h2>
+              <div class="dialogue">
+                <p>Bro, quería hacerte un detalle porque se te aprecia un huevo.</p>
+                <p>Que esta nueva etapa venga con viajes, risas, mucho entreno y gente que merezca la pena cerca.</p>
+                <p class="cursor"><strong>Feliz cumpleaños, crack, leyenda, mastodonte, figura, monstruo, tiburón. Level 30 desbloqueado.</strong></p>
+              </div>
+              <div class="secret" id="secret">Góticas culonas desbloqueadas: A tan solo un radio de 5km de distancia. Pokebolas añadidas al inventario.</div>
+            </div>
+            <div class="action-row">
+              <button class="main-btn" onclick="resetGame()">CELEBRAR OTRA VEZ</button>
+              <button class="alt-btn" id="secretBtn" onclick="revealSecret()">SELECT: archivo oculto</button>
+            </div>
+          </section>
+          <div class="konami-toast" id="konamiToast" role="status" aria-live="polite">LOL, sal ya de aquí</div>
+        </div>
+      </div>
+
+      <div class="controls" aria-hidden="true">
+        <div class="dpad"></div>
+        <div class="brand">GAME BRO<small>STU EDITION</small></div>
+        <div class="ab"><button class="round" onclick="pressA()">A</button><button class="round" onclick="pressB()">B</button></div>
+      </div>
+      <div class="menu-row"><button class="pill menu-btn" onclick="pressSelect()">SELECT</button><button class="pill menu-btn" onclick="pressA()">START</button></div>
+      <div class="footer-note">NINTENBRO</div>
+    </div>
+  </main>
+
+  <script>
+    const views = Array.from(document.querySelectorAll('.view'));
+    const device = document.getElementById('device');
+    const screen = document.getElementById('screen');
+    let current = 0;
+    let audioCtx;
+    let soundEnabled = true;
+    const konamiTarget = ['A', 'B', 'A', 'B', 'SELECT'];
+    let konamiBuffer = [];
+    let bossAttacks = 0;
+    let secretUnlocked = false;
+
+
+
+    function registerCode(key) {
+      konamiBuffer.push(key);
+      if (konamiBuffer.length > konamiTarget.length) konamiBuffer.shift();
+      const matched = konamiTarget.every((value, index) => konamiBuffer[index] === value);
+      if (matched) {
+        konamiBuffer = [];
+        unlockKonami();
+      }
+    }
+
+    function unlockKonami() {
+      const toast = document.getElementById('konamiToast');
+      if (toast) {
+        toast.classList.remove('show');
+        void toast.offsetWidth;
+        toast.textContent = 'LOL, sal ya de aquí';
+        toast.classList.add('show');
+      }
+      device.classList.add('shake');
+      setTimeout(() => device.classList.remove('shake'), 420);
+      burstConfetti(170);
+      secretSound();
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundBtn');
+      if (btn) {
+        btn.classList.toggle('off', !soundEnabled);
+        const label = btn.querySelector('span:last-child');
+        if (label) label.textContent = soundEnabled ? 'SOUND: ON' : 'SOUND: OFF';
+      }
+      if (soundEnabled) powerSound();
+    }
+
+    function showView(index) {
+      views[current].classList.remove('active');
+      current = Math.max(0, Math.min(index, views.length - 1));
+      views[current].classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      clickSound();
+      if (current === 4) resetBoss(false);
+      if (current === views.length - 1) burstConfetti(160);
+    }
+
+    function nextView() {
+      if (current === 4 && bossAttacks < 3) {
+        attackBoss();
+        return;
+      }
+      showView(current + 1);
+    }
+    function prevView() { showView(current - 1); }
+
+    function startGame() {
+      powerSound();
+      burstConfetti(90);
+      showView(1);
+    }
+
+    function dangerButton() {
+      document.getElementById('dangerText').textContent = 'Chuck Norris no pulsa START. START espera a que Chuck Norris esté listo.';
+      device.classList.add('shake');
+      setTimeout(() => device.classList.remove('shake'), 380);
+      burstConfetti(45);
+      clickSound();
+    }
+
+    function setPixelBar(id, percent) {
+      const el = document.getElementById(id);
+      if (el) el.style.setProperty('--w', percent + '%');
+    }
+
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    function resetBoss(playSound = true) {
+      bossAttacks = 0;
+      const hpBar = document.getElementById('bossHpBar');
+      const boss = document.getElementById('bossSprite');
+      const scene = document.getElementById('battleScene');
+      if (hpBar) hpBar.style.width = '100%';
+      if (boss) boss.classList.remove('hit');
+      if (scene) scene.className = 'battle-scene';
+      setText('bossHpText', 'HP 90/90');
+      setText('bossHpLabel', '90%');
+      setText('battleText', 'La Treintena apareció. Necesitas 3 ataques para continuar.');
+      setText('attackBtn', 'A: ONDA VITAL');
+      ['statCrossfit', 'statTravel', 'statHumor', 'statKnees'].forEach(id => setPixelBar(id, 0));
+      setText('statCrossfitText', '0%');
+      setText('statTravelText', '0%');
+      setText('statHumorText', '0%');
+      setText('statKneesText', '0%');
+      if (playSound) clickSound();
+    }
+
+    function attackBoss() {
+      if (bossAttacks >= 3) return;
+      bossAttacks += 1;
+      const hp = Math.max(0, 90 - bossAttacks * 30);
+      const hpPercent = Math.round((hp / 90) * 100);
+      const scene = document.getElementById('battleScene');
+      const boss = document.getElementById('bossSprite');
+      const hpBar = document.getElementById('bossHpBar');
+      const attackBtn = document.getElementById('attackBtn');
+      const attacks = [
+        {
+          name: 'ONDA VITAL',
+          text: 'STU usa ONDA VITAL. La Treintena recibe un fogonazo de nostalgia y bíceps.',
+          sound: 260,
+          next: 'A: SPIN ATTACK'
+        },
+        {
+          name: 'SPIN ATTACK',
+          text: 'STU usa SPIN ATTACK. Cajas Wumpa rotas. Dignidad del boss reducida.',
+          sound: 420,
+          next: 'A: IMPACTRUENO'
+        },
+        {
+          name: 'IMPACTRUENO',
+          text: 'STU usa IMPACTRUENO. Es súper efectivo contra dolores de treintañero.',
+          sound: 620,
+          next: 'VICTORIA'
+        }
+      ];
+      const stats = [
+        { crossfit: 33, travel: 28, humor: 38, knees: 14 },
+        { crossfit: 66, travel: 62, humor: 73, knees: 29 },
+        { crossfit: 100, travel: 91, humor: 100, knees: 43 }
+      ][bossAttacks - 1];
+
+      if (scene) {
+        scene.className = 'battle-scene';
+        void scene.offsetWidth;
+        scene.classList.add('attack-' + bossAttacks, 'shock');
+        setTimeout(() => scene.classList.remove('shock'), 300);
+      }
+      if (screen) {
+        screen.classList.remove('shock');
+        void screen.offsetWidth;
+        screen.classList.add('shock');
+        setTimeout(() => screen.classList.remove('shock'), 300);
+      }
+      if (boss) {
+        boss.classList.remove('hit');
+        void boss.offsetWidth;
+        boss.classList.add('hit');
+      }
+      if (hpBar) hpBar.style.width = hpPercent + '%';
+      setText('bossHpText', 'HP ' + hp + '/90');
+      setText('bossHpLabel', hpPercent + '%');
+      setText('battleText', attacks[bossAttacks - 1].text);
+      setPixelBar('statCrossfit', stats.crossfit);
+      setPixelBar('statTravel', stats.travel);
+      setPixelBar('statHumor', stats.humor);
+      setPixelBar('statKnees', stats.knees);
+      setText('statCrossfitText', stats.crossfit + '%');
+      setText('statTravelText', stats.travel + '%');
+      setText('statHumorText', stats.humor + '%');
+      setText('statKneesText', stats.knees + '%');
+      burstConfetti(bossAttacks === 3 ? 180 : 55);
+      beep(attacks[bossAttacks - 1].sound, .08, 'square', .035);
+
+      if (bossAttacks < 3) {
+        if (attackBtn) attackBtn.textContent = attacks[bossAttacks - 1].next;
+      } else {
+        if (attackBtn) attackBtn.textContent = 'VICTORIA';
+        victorySound();
+        setTimeout(() => showView(5), 950);
+      }
+    }
+
+    function pressA() {
+      registerCode('A');
+      if (current === 4) {
+        attackBoss();
+      } else if (current === 0) {
+        startGame();
+      } else {
+        nextView();
+      }
+    }
+
+    function pressB() {
+      registerCode('B');
+      const comments = [
+        'B no cancela los 30. Solo los pone en modo difícil.',
+        'STU intentó huir, pero la birra pendiente bloquea la salida.',
+        'No puedes volver atrás: la partida ya huele a aftersun y agujetas.',
+        'El botón B ha pedido kebab. Respuesta lógica.'
+      ];
+      const msg = comments[Math.floor(Math.random() * comments.length)];
+      const battleText = document.getElementById('battleText');
+      const dangerText = document.getElementById('dangerText');
+      const activeDialogue = views[current]?.querySelector('.dialogue p');
+      if (current === 4 && battleText) {
+        battleText.textContent = msg;
+      } else if (current === 0 && dangerText) {
+        dangerText.textContent = msg;
+      } else if (activeDialogue) {
+        activeDialogue.textContent = msg;
+        activeDialogue.classList.add('cursor');
+      }
+      device.classList.add('shake');
+      setTimeout(() => device.classList.remove('shake'), 380);
+      clickSound();
+    }
+
+
+
+    function pressSelect() {
+      registerCode('SELECT');
+      if (current === views.length - 1) {
+        revealSecret(true);
+        return;
+      }
+      const comments = [
+        'SELECT detectado: menú secreto cerrado por falta de madurez.',
+        'Archivo oculto localizado. Requiere camiseta de Chuck Norris.',
+        'SELECT no hace milagros, pero añade misterio barato.',
+        'La consola sospecha que estás buscando algo raro.'
+      ];
+      const msg = comments[Math.floor(Math.random() * comments.length)];
+      const activeDialogue = views[current]?.querySelector('.dialogue p');
+      const dangerText = document.getElementById('dangerText');
+      if (activeDialogue) {
+        activeDialogue.textContent = msg;
+        activeDialogue.classList.add('cursor');
+      } else if (dangerText) {
+        dangerText.textContent = msg;
+      }
+      device.classList.add('shake');
+      setTimeout(() => device.classList.remove('shake'), 380);
+      burstConfetti(35);
+      clickSound();
+    }
+
+    function revealSecret(fromPhysicalSelect = false) {
+      if (!fromPhysicalSelect) registerCode('SELECT');
+      const secret = document.getElementById('secret');
+      const btn = document.getElementById('secretBtn');
+      if (!secretUnlocked) {
+        secretUnlocked = true;
+        if (secret) secret.classList.add('show');
+        if (btn) btn.textContent = 'SELECT: Camiseta Chuck Norris';
+        burstConfetti(120);
+        powerSound();
+        return;
+      }
+      device.classList.add('shake');
+      setTimeout(() => device.classList.remove('shake'), 380);
+      burstConfetti(110);
+      clickSound();
+    }
+
+    function resetGame() {
+      secretUnlocked = false;
+      const secret = document.getElementById('secret');
+      const btn = document.getElementById('secretBtn');
+      if (secret) secret.classList.remove('show');
+      if (btn) btn.textContent = 'SELECT: archivo oculto';
+      resetBoss(false);
+      burstConfetti(220);
+      victorySound();
+      showView(0);
+    }
+
+    function beep(freq, duration, type = 'square', volume = 0.035) {
+      if (!soundEnabled) return;
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function clickSound() { beep(392, .045, 'square', .022); }
+    function powerSound() { [196, 262, 330, 392].forEach((f, i) => setTimeout(() => beep(f, .07, 'square', .032), i * 70)); }
+    function victorySound() { [523, 659, 784, 1046, 784].forEach((f, i) => setTimeout(() => beep(f, .09, 'square', .035), i * 90)); }
+    function secretSound() { [784, 740, 784, 988, 392].forEach((f, i) => setTimeout(() => beep(f, .06, 'square', .032), i * 55)); }
+
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let pieces = [];
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function burstConfetti(amount = 120) {
+      const colors = ['#9bbc0f', '#0f380f', '#306230', '#8d1749', '#c7c3b8'];
+      for (let i = 0; i < amount; i++) {
+        pieces.push({
+          x: window.innerWidth / 2 + (Math.random() - .5) * 80,
+          y: window.innerHeight * .22,
+          vx: (Math.random() - .5) * 9,
+          vy: Math.random() * -8 - 2,
+          size: Math.random() * 7 + 4,
+          rot: Math.random() * Math.PI,
+          spin: (Math.random() - .5) * .4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          life: 160 + Math.random() * 80
+        });
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      pieces = pieces.filter(p => p.life > 0);
+      for (const p of pieces) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += .17;
+        p.vx *= .99;
+        p.rot += p.spin;
+        p.life--;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.globalAlpha = Math.max(0, Math.min(1, p.life / 70));
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    setTimeout(() => burstConfetti(35), 500);
+  </script>
+</body>
+</html>
