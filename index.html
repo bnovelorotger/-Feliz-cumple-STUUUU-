@@ -1235,7 +1235,7 @@
   <canvas id="confetti"></canvas>
   <main class="wrap">
     <div class="gameboy" id="device">
-      <button class="sound-toggle" id="soundBtn" onclick="toggleSound()" aria-label="Activar o desactivar sonido"><span class="speaker-px" aria-hidden="true"></span><span>SOUND: ON</span></button>
+      <button class="sound-toggle" id="soundBtn" onclick="toggleSound()" aria-label="Activar o desactivar sonido y música de fondo" title="Sonido y música retro de fondo"><span class="speaker-px" aria-hidden="true"></span><span>SOUND: ON</span></button>
       <div class="top-label">DOT MATRIX WITH STEREO SOUND</div>
       <div class="screen-frame">
         <div class="power">power</div>
@@ -1368,6 +1368,22 @@
     let current = 0;
     let audioCtx;
     let soundEnabled = true;
+    let musicTimer = null;
+    let musicStep = 0;
+    const bgMelody = [
+      // Hilo musical cumpleañero arcade: beeps suaves en loop, sin archivos externos.
+      { f: 392, d: .10, gap: 180 }, { f: 392, d: .10, gap: 180 }, { f: 440, d: .16, gap: 280 },
+      { f: 392, d: .16, gap: 280 }, { f: 523, d: .16, gap: 280 }, { f: 494, d: .28, gap: 520 },
+      { f: 0, d: 0, gap: 180 },
+      { f: 392, d: .10, gap: 180 }, { f: 392, d: .10, gap: 180 }, { f: 440, d: .16, gap: 280 },
+      { f: 392, d: .16, gap: 280 }, { f: 587, d: .16, gap: 280 }, { f: 523, d: .28, gap: 560 },
+      { f: 0, d: 0, gap: 220 },
+      { f: 392, d: .10, gap: 180 }, { f: 392, d: .10, gap: 180 }, { f: 784, d: .16, gap: 280 },
+      { f: 659, d: .16, gap: 280 }, { f: 523, d: .16, gap: 280 }, { f: 494, d: .16, gap: 280 },
+      { f: 440, d: .28, gap: 560 }, { f: 0, d: 0, gap: 220 },
+      { f: 698, d: .10, gap: 180 }, { f: 698, d: .10, gap: 180 }, { f: 659, d: .16, gap: 280 },
+      { f: 523, d: .16, gap: 280 }, { f: 587, d: .16, gap: 280 }, { f: 523, d: .30, gap: 1100 }
+    ];
     const konamiTarget = ['A', 'B', 'A', 'B', 'SELECT'];
     let konamiBuffer = [];
     let bossAttacks = 0;
@@ -1407,7 +1423,12 @@
         const label = btn.querySelector('span:last-child');
         if (label) label.textContent = soundEnabled ? 'SOUND: ON' : 'SOUND: OFF';
       }
-      if (soundEnabled) powerSound();
+      if (soundEnabled) {
+        powerSound();
+        startBackgroundMusic();
+      } else {
+        stopBackgroundMusic();
+      }
     }
 
     function showView(index) {
@@ -1430,12 +1451,14 @@
     function prevView() { showView(current - 1); }
 
     function startGame() {
+      startBackgroundMusic();
       powerSound();
       burstConfetti(90);
       showView(1);
     }
 
     function dangerButton() {
+      startBackgroundMusic();
       document.getElementById('dangerText').textContent = 'Chuck Norris no pulsa START. START espera a que Chuck Norris esté listo.';
       device.classList.add('shake');
       setTimeout(() => device.classList.remove('shake'), 380);
@@ -1474,6 +1497,7 @@
     }
 
     function attackBoss() {
+      startBackgroundMusic();
       if (bossAttacks >= 3) return;
       bossAttacks += 1;
       const hp = Math.max(0, 90 - bossAttacks * 30);
@@ -1550,6 +1574,7 @@
     }
 
     function pressA() {
+      startBackgroundMusic();
       registerCode('A');
       if (current === 4) {
         attackBoss();
@@ -1561,6 +1586,7 @@
     }
 
     function pressB() {
+      startBackgroundMusic();
       registerCode('B');
       const comments = [
         'B no cancela los 30. Solo los pone en modo difícil.',
@@ -1588,6 +1614,7 @@
 
 
     function pressSelect() {
+      startBackgroundMusic();
       registerCode('SELECT');
       if (current === views.length - 1) {
         revealSecret(true);
@@ -1615,6 +1642,7 @@
     }
 
     function revealSecret(fromPhysicalSelect = false) {
+      startBackgroundMusic();
       if (!fromPhysicalSelect) registerCode('SELECT');
       const secret = document.getElementById('secret');
       const btn = document.getElementById('secretBtn');
@@ -1644,22 +1672,52 @@
       showView(0);
     }
 
-    function beep(freq, duration, type = 'square', volume = 0.035) {
-      if (!soundEnabled) return;
+    function ensureAudioContext() {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTone(freq, duration, type = 'square', volume = 0.035) {
       try {
-        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const ctxAudio = ensureAudioContext();
+        const osc = ctxAudio.createOscillator();
+        const gain = ctxAudio.createGain();
         osc.type = type;
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        gain.gain.setValueAtTime(volume, ctxAudio.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + duration);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctxAudio.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + duration);
+        osc.stop(ctxAudio.currentTime + duration);
       } catch (e) {}
+    }
+
+    function beep(freq, duration, type = 'square', volume = 0.035) {
+      if (!soundEnabled) return;
+      playTone(freq, duration, type, volume);
+    }
+
+    function scheduleBackgroundNote() {
+      if (!soundEnabled) { stopBackgroundMusic(); return; }
+      const note = bgMelody[musicStep % bgMelody.length];
+      musicStep += 1;
+      if (note.f) playTone(note.f, note.d, 'square', .005);
+      musicTimer = setTimeout(scheduleBackgroundNote, note.gap);
+    }
+
+    function startBackgroundMusic() {
+      if (!soundEnabled || musicTimer) return;
+      try {
+        ensureAudioContext();
+        scheduleBackgroundNote();
+      } catch (e) {}
+    }
+
+    function stopBackgroundMusic() {
+      if (musicTimer) clearTimeout(musicTimer);
+      musicTimer = null;
     }
 
     function clickSound() { beep(392, .045, 'square', .022); }
